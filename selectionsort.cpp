@@ -23,6 +23,8 @@ int main(){
             }
         }
         ///Swap min_i && i th bucket
+        // swap(a[min_i],a[i]);
+        
         int temp = a[min_i];
         a[min_i] = a[i];
         a[i] = temp;
