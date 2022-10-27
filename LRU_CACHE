@@ -1,0 +1,83 @@
+class LRUCache {
+public:
+    class node{
+        public:
+        // rank,key Doubly lined List with head and tail
+        int key;
+        int value;
+        node *prev;
+        node *next;
+        node(int varKey,int varValue){
+            key=varKey;
+            value=varValue;
+        }
+    };
+    
+    node* head=new node(-1,-1);
+    node* tail=new node(-1,-1);
+    
+    int capacity;
+    unordered_map<int,node*> mapLRU;        // key and pointer to that key,value in list
+
+    
+    //Constructor to initialize capacity
+    LRUCache(int varCap) {
+        capacity=varCap;
+        head->next=tail;
+        tail->prev=head;
+    }
+    
+    void insertNode(node* newNode){     // Update/Insert in List front
+        node* temp=head->next;
+        newNode->next=temp;
+        newNode->prev=head;
+        head->next=newNode;
+        temp->prev=newNode;
+    }
+    
+    void deleteNode(node* delNode){
+        node* delPrev=delNode->prev;
+        node* delNext=delNode->next;
+        delPrev->next=delNext;
+        delNext->prev=delPrev;
+    }
+    
+    //get() function to find the value of a particular key
+    int get(int key) {
+        if(mapLRU.find(key)!=mapLRU.end()){
+            node* holdNode=mapLRU[key];
+            int holdVal=holdNode->value;
+            mapLRU.erase(key);
+            deleteNode(holdNode);
+            insertNode(holdNode);
+            mapLRU[key]=head->next;
+            return holdVal;
+        }
+        
+    // in case key is not present will return -1
+        return -1;
+    }
+    
+    //put() function to update/insert new value to a particular key
+    void put(int key, int value) {
+        if(mapLRU.find(key)!=mapLRU.end()){
+            node* exitingNode = mapLRU[key];
+            mapLRU.erase(key);
+            deleteNode(exitingNode);
+        }
+        if(mapLRU.size() == capacity){
+            //map exceeds capacity
+            mapLRU.erase(tail->prev->key);
+            deleteNode(tail-> prev);
+        }
+        insertNode(new node(key,value));        // Update/Insert in List front
+        mapLRU[key]=head->next;                 // Update/Insert in map
+    }
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
